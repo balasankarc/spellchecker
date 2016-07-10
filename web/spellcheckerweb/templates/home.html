@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <title>Malayalam Spellchecker</title>
+        <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+        <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="/static/css/bootstrap.css" type="text/css" />
+        <script>
+function loadDoc() {
+    var root_word = document.getElementById("word").value;
+    var word = $.trim(root_word);
+    if (word == "")
+    {
+        document.getElementById("demo").innerHTML = "<p class='alert alert-danger'>Enter a word </p>";
+    }
+    else
+    {
+        var result = $.ajax({url:"http://localhost:5000/api/check",
+            type:"GET",
+            async:false,
+            cache:false,
+            timeout:300000,
+            data: {word:word}
+        });
+        var jsonobject = JSON.parse(result.responseText);
+        if (jsonobject['status'] == 1)
+        {
+            document.getElementById("demo").innerHTML = "<p class='alert alert-success'>It is a valid word</p>";
+        }
+        else if (jsonobject['status'] == 2)
+        {
+            document.getElementById("demo").innerHTML = "<p class='alert alert-success'>Word not found in dictionary. But, it is unique. Hence deemed valid.</p>";
+        }
+        else
+        {
+            text = "";
+            for (counter in jsonobject['suggestions'])
+            {
+                text = text + jsonobject['suggestions'][counter] + "<br />";
+            }
+            document.getElementById("demo").innerHTML = "<p class='alert alert-danger'>" + text + "</p>";
+        }
+    }
+}
+        </script>
+    </head>
+    <body>
+        <h1 style="text-align:center">Malayalam Spellchecker </h1>
+        <div style="margin:0 auto;width:50%">
+            <div class="row">
+                <div class="input-group">
+                    <input class="form-control" id="word" name="word" placeholder="Input Word" required/>
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" onclick="loadDoc()">Go!</button>
+                    </span>
+                </div><!-- /input-group -->
+            </div>
+            <div class="row" style="margin-top:1%">
+                <p id="demo" style="margin-bottom:10%"></p>
+            </div>
+        </div>
+    </body>
+</html>
